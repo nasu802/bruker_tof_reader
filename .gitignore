@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# 自動生成・データフォルダ
+data/
+archive/
+html/
+pictures/
+
+# Plotly JS（初回起動時に自動ダウンロードされる）
+plotly-2.35.2.min.js
