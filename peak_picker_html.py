@@ -1011,6 +1011,10 @@ def main():
     # 各パスを展開して測定フォルダを収集
     all_dirs = []
     for input_path in args.input_paths:
+        if not Path(input_path).exists():
+            print(f"[ERR] パスが存在しません: {Path(input_path).resolve()}")
+            print(f"      データフォルダのパスを確認してください。")
+            continue
         found = find_all_measurement_dirs(input_path)
         if not found:
             print(f"[WARN] 測定フォルダが見つかりませんでした: {input_path}")
