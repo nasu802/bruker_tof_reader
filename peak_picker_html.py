@@ -204,7 +204,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <div id="header">
   <h1 id="header-title">Peak Picker ― {title}</h1>
   <span style="font-size:12px;opacity:0.8">ラベル密度</span>
-  <input id="label-gap-slider" type="range" min="0" max="200" step="1" value="140" style="width:120px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右端: 全表示 / 左端: 非表示）">
+  <input id="label-gap-slider" type="range" min="0" max="200" step="1" value="150" style="width:120px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右端: 全表示 / 左端: 非表示）">
   <button onclick="resetLabelGap()" title="ラベル密度を初期値に戻す" style="font-size:11px;padding:3px 7px;background:#aaa;color:#fff;border-color:#aaa;">↺</button>
   <button onclick="savePng()">グラフ保存</button>
   <button onclick="clearAll()" class="danger">全消去</button>
@@ -814,7 +814,7 @@ function renderLabels() {
     lo = X_DATA[0] ?? 0; hi = X_DATA[X_DATA.length - 1] ?? 1;
   }
   const pxPerMz  = plotWidth / Math.max(hi - lo, 0.01);
-  const minMzGap = Math.max(labelGap, 14) / pxPerMz;  // スライダー(px)→m/z換算
+  const minMzGap = Math.max(labelGap, 0.1) / pxPerMz;  // スライダー(px)→m/z換算
 
   // 表示範囲内のピークを強度降順で greedy 選択
   const candidates = peaks
@@ -866,13 +866,12 @@ function savePng() {
 // ── ラベル全表示トグル ────────────────────────────────────────
 let showAllLabels = false;
 const LABEL_GAP_DEFAULT = 25;  // px
-const LABEL_SLIDER_DEFAULT = 140;  // 200-25=175 → 140程度
+const LABEL_SLIDER_DEFAULT = 150;  // 200-25/0.5=150
 let labelGap = LABEL_GAP_DEFAULT;
 function updateLabelGap(val) {
   const v = parseFloat(val);
-  if (v === 0) { labelGap = 0; showAllLabels = false; }
-  else if (v === 200) { showAllLabels = true; }
-  else { showAllLabels = false; labelGap = 200 - v; }
+  showAllLabels = false;
+  labelGap = v === 0 ? 0 : (200 - v) * 0.5;  // val=200→0.5px(全表示に近い), val=0→非表示
   renderLabels();
 }
 function resetLabelGap() {
