@@ -15,6 +15,25 @@ import time
 import urllib.request
 from pathlib import Path
 
+__version__ = "2026.03.07"
+_UPDATE_URL = "https://raw.githubusercontent.com/nasu802/bruker_tof_reader/main/peak_picker_html.py"
+
+
+def _check_update() -> None:
+    """GitHubの最新バージョンを確認して通知する（オフライン時は無視）。"""
+    try:
+        req = urllib.request.Request(_UPDATE_URL, headers={"User-Agent": "bruker_tof_reader"})
+        with urllib.request.urlopen(req, timeout=3) as r:
+            for line in r.read().decode("utf-8").splitlines():
+                if line.startswith("__version__"):
+                    latest = line.split('"')[1]
+                    if latest != __version__:
+                        print(f"[INFO] アップデートがあります: {__version__} → {latest}")
+                        print(f"       git pull または {_UPDATE_URL} から最新版を取得してください。")
+                    break
+    except Exception:
+        pass  # オフライン or タイムアウト → 無視
+
 import numpy as np
 
 # ── Plotly ローカルキャッシュ ────────────────────────────────────
@@ -853,6 +872,7 @@ function clearAll() {
     '全消去はピークラベルを消すだけです。スペクトルデータは消えません。',
     'グラフをダブルクリックするとズームがリセットされて全体表示に戻ります。',
     'マウスホイールでもズームできます。ドラッグで範囲ズームも可。',
+    'グラフの左端の縦軸（数字が並んでいるところ）をドラッグすると、グラフを上下にスライドできます。横軸も同様です。',
     'サイドバーの + ボタンで複数サンプルを重ねて比較できます。何サンプルでも重ねられます。',
     '重ね表示中のスライダーで強度スケールをサンプルごとに個別調整できます。',
     '範囲削除モードでドラッグすると、範囲内のピークをまとめて削除できます。',
@@ -1004,6 +1024,9 @@ def main():
         finally:
             stop.set()
             t.join()
+
+    # アップデート確認（オフライン時は無視）
+    _check_update()
 
     # Plotly JS をローカルに確保（初回のみダウンロード）
     _ensure_plotly()
