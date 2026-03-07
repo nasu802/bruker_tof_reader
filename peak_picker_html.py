@@ -206,7 +206,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   <span style="font-size:12px;opacity:0.8">ラベル密度</span>
   <input id="label-gap-slider" type="range" min="0" max="200" step="1" value="60" style="width:120px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右端: 全表示 / 左端: 非表示）">
   <button onclick="resetLabelGap()" title="ラベル密度を初期値に戻す" style="font-size:11px;padding:3px 7px;background:#aaa;color:#fff;border-color:#aaa;">↺</button>
-  <span style="display:inline-flex;gap:0"><button onclick="savePng()" style="border-radius:4px 0 0 4px">グラフ保存</button><button id="btn-legend" onclick="toggleLegend()" title="凡例表示切替" style="padding:3px 8px;border-left:none;border-radius:0 4px 4px 0;background:#fff;color:#555;">☰</button></span>
+  <span style="display:inline-flex;gap:0"><button onclick="savePng()" style="border-radius:4px 0 0 4px">グラフ保存</button><button id="btn-legend" onclick="toggleLegend()" title="凡例表示切替" style="width:18px;padding:0;border-left:none;border-radius:0 4px 4px 0;background:#fff;"></button></span>
   <button onclick="clearAll()" class="danger">全消去</button>
   <button id="fb-btn" title="バグ報告・ご要望" style="background:#34495e;color:#fff;border-color:#34495e;font-size:12px;padding:4px 10px;">お悩みボックス</button>
 </div>
