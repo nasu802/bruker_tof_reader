@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bruker TOF Peak Picker — セットアップ＆実行マニュアル</title>
+  <style>
+    :root{
+      --bg:#0b0f14; --text:#e6edf3; --muted:#aab6c5; --line:#223045;
+      --accent:#6ee7ff; --good:#7CFF6B; --bad:#ff6b6b;
+      --code:#070a0e;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.7;}
+    a{color:var(--accent);text-decoration:none;}
+    a:hover{text-decoration:underline;}
+
+    .wrap{max-width:680px;margin:0 auto;padding:40px 20px 80px;}
+
+    /* Header */
+    h1{font-size:20px;margin:0 0 6px;}
+    .lead{color:var(--muted);font-size:14px;margin:0 0 24px;}
+    .repo-link{font-size:13px;color:var(--muted);margin-bottom:32px;display:block;}
+
+    /* Step */
+    .step{margin-bottom:40px;}
+    .step-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+    .step-num{
+      width:28px;height:28px;border-radius:50%;
+      background:rgba(110,231,255,.15);border:1px solid rgba(110,231,255,.35);
+      color:var(--accent);font-size:13px;font-weight:bold;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .step-title{font-size:17px;font-weight:bold;margin:0;}
+    .step-body{padding-left:40px;}
+    .step-body p{margin:0 0 10px;color:var(--muted);font-size:14px;}
+
+    /* Tabs */
+    .tabs{display:flex;gap:6px;margin-bottom:10px;}
+    .tab{
+      padding:5px 14px;border-radius:999px;border:1px solid var(--line);
+      background:transparent;color:var(--muted);font-size:13px;cursor:pointer;
+    }
+    .tab.active{
+      background:rgba(110,231,255,.12);color:var(--text);border-color:rgba(110,231,255,.35);
+    }
+    .panel{display:none;}
+    .panel.active{display:block;}
+
+    /* Code block */
+    .code-wrap{
+      background:var(--code);border:1px solid var(--line);border-radius:12px;
+      padding:14px 16px;margin-bottom:8px;position:relative;
+    }
+    code,pre{font-family:var(--mono);font-size:13px;color:var(--text);margin:0;white-space:pre;}
+    .copy-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+    .btn-copy{
+      padding:5px 14px;border-radius:8px;border:1px solid var(--line);
+      background:rgba(255,255,255,.05);color:var(--text);font-size:12px;cursor:pointer;
+    }
+    .btn-copy:hover{border-color:rgba(110,231,255,.4);}
+    .copy-status{font-size:12px;color:var(--muted);}
+    .copy-status.ok{color:var(--good);}
+    .copy-status.bad{color:var(--bad);}
+
+    /* Note */
+    .note{
+      border-left:3px solid var(--accent);padding:8px 12px;
+      background:rgba(110,231,255,.05);border-radius:0 8px 8px 0;
+      color:var(--muted);font-size:13px;margin-bottom:10px;
+    }
+    .warn-note{
+      border-left:3px solid #ffd86e;padding:8px 12px;
+      background:rgba(255,216,110,.05);border-radius:0 8px 8px 0;
+      color:var(--muted);font-size:13px;margin-bottom:10px;
+    }
+    ul.list{padding-left:18px;color:var(--muted);font-size:14px;margin:8px 0;}
+    ul.list li{margin-bottom:6px;}
+
+    .divider{height:1px;background:var(--line);margin:14px 0;}
+    .sub-label{font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:bold;letter-spacing:.05em;}
+
+    footer{color:var(--muted);font-size:12px;text-align:center;margin-top:40px;}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Bruker TOF Peak Picker — セットアップ＆実行マニュアル</h1>
+  <p class="lead">コマンドは「コピー」ボタンでクリップボードに入ります。上から順に実行してください。</p>
+  <a class="repo-link" href="https://github.com/nasu802/bruker_tof_reader" target="_blank" rel="noreferrer">→ GitHub: nasu802/bruker_tof_reader</a>
+
+  <!-- Step 1 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <h2 class="step-title">Pythonのインストール</h2>
+    </div>
+    <div class="step-body">
+      <div class="tabs">
+        <button class="tab active" data-panel="py-mac">Mac</button>
+        <button class="tab" data-panel="py-win">Windows</button>
+      </div>
+
+      <div class="panel active" id="py-mac">
+        <p>Homebrewが入っている場合はターミナルで実行。</p>
+        <div class="code-wrap"><code id="c-py-mac">brew install python</code></div>
+        <div class="copy-row">
+          <button class="btn-copy" data-target="c-py-mac">📋 コピー</button>
+          <span class="copy-status" id="s-py-mac"></span>
+        </div>
+        <div class="note">Homebrewがない場合は <a href="https://brew.sh" target="_blank">brew.sh</a> からインストールしてください。</div>
+      </div>
+
+      <div class="panel" id="py-win">
+        <p>Microsoft Store で「Python」と検索してインストール。</p>
+        <div class="note">インストール後、コマンドプロンプトで <code>python --version</code> が表示されればOK。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <h2 class="step-title">必要ライブラリのインストール（NumPy）</h2>
+    </div>
+    <div class="step-body">
+      <div class="tabs">
+        <button class="tab active" data-panel="np-mac">Mac</button>
+        <button class="tab" data-panel="np-win">Windows</button>
+      </div>
+
+      <div class="panel active" id="np-mac">
+        <div class="code-wrap"><code id="c-np-mac">python3 -m pip install numpy</code></div>
+        <div class="copy-row">
+          <button class="btn-copy" data-target="c-np-mac">📋 コピー</button>
+          <span class="copy-status" id="s-np-mac"></span>
+        </div>
+      </div>
+
+      <div class="panel" id="np-win">
+        <div class="code-wrap"><code id="c-np-win">python -m pip install numpy</code></div>
+        <div class="copy-row">
+          <button class="btn-copy" data-target="c-np-win">📋 コピー</button>
+          <span class="copy-status" id="s-np-win"></span>
+        </div>
+      </div>
+
+      <div class="warn-note">うまくいかない場合は先に <code>python -m pip install --upgrade pip</code> を実行してみてください。</div>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <h2 class="step-title">ツールのダウンロード</h2>
+    </div>
+    <div class="step-body">
+      <div class="tabs">
+        <button class="tab active" data-panel="dl-git">Gitが使える</button>
+        <button class="tab" data-panel="dl-zip">Gitがない</button>
+      </div>
+
+      <div class="panel active" id="dl-git">
+        <div class="code-wrap"><code id="c-dl-git">git clone https://github.com/nasu802/bruker_tof_reader.git
+cd bruker_tof_reader</code></div>
+        <div class="copy-row">
+          <button class="btn-copy" data-target="c-dl-git">📋 コピー</button>
+          <span class="copy-status" id="s-dl-git"></span>
+        </div>
+      </div>
+
+      <div class="panel" id="dl-zip">
+        <p>以下のページを開き、<strong>Code → Download ZIP</strong> を選んでZIPを解凍。</p>
+        <div class="code-wrap"><code id="c-dl-zip">https://github.com/nasu802/bruker_tof_reader</code></div>
+        <div class="copy-row">
+          <button class="btn-copy" data-target="c-dl-zip">📋 コピー</button>
+          <span class="copy-status" id="s-dl-zip"></span>
+        </div>
+        <ul class="list">
+          <li>解凍後の <code>bruker_tof_reader</code> フォルダを開く</li>
+          <li>以降のコマンドはそのフォルダ内で実行する</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <h2 class="step-title">実行</h2>
+    </div>
+    <div class="step-body">
+      <div class="tabs">
+        <button class="tab active" data-panel="run-mac">Mac</button>
+        <button class="tab" data-panel="run-win">Windows</button>
+      </div>
+
+      <div class="panel active" id="run-mac">
+        <div class="sub-label">基本形</div>
+        <div class="code-wrap"><code id="c-run-mac-1">python3 peak_picker_html.py データフォルダのパス</code></div>
+        <div class="copy-row">
+          <button class="btn-copy" data-target="c-run-mac-1">📋 コピー</button>
+          <span class="copy-status" id="s-run-mac-1"></span>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-label">例</div>
+        <div class="code-wrap"><code id="c-run-mac-2">python3 peak_picker_html.py data/sample1</code></div>
+        <div class="copy-row">
+          <button class="btn-copy" data-target="c-run-mac-2">📋 コピー</button>
+          <span class="copy-status" id="s-run-mac-2"></span>
+        </div>
+      </div>
+
+      <div class="panel" id="run-win">
+        <div class="sub-label">基本形</div>
+        <div class="code-wrap"><code id="c-run-win-1">python peak_picker_html.py データフォルダのパス</code></div>
+        <div class="copy-row">
+          <button class="btn-copy" data-target="c-run-win-1">📋 コピー</button>
+          <span class="copy-status" id="s-run-win-1"></span>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-label">例</div>
+        <div class="code-wrap"><code id="c-run-win-2">python peak_picker_html.py data\sample1</code></div>
+        <div class="copy-row">
+          <button class="btn-copy" data-target="c-run-win-2">📋 コピー</button>
+          <span class="copy-status" id="s-run-win-2"></span>
+        </div>
+      </div>
+
+      <div class="note">実行するとブラウザが自動で開き、スペクトルが表示されます。</div>
+    </div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <h2 class="step-title">アップデート（git clone した場合）</h2>
+    </div>
+    <div class="step-body">
+      <p>以下の1コマンドで最新版に更新できます。</p>
+      <div class="code-wrap"><code id="c-update">git pull</code></div>
+      <div class="copy-row">
+        <button class="btn-copy" data-target="c-update">📋 コピー</button>
+        <span class="copy-status" id="s-update"></span>
+      </div>
+      <div class="note">ZIPで配布した場合は最新ZIPを再ダウンロードしてください。</div>
+    </div>
+  </div>
+
+  <!-- Troubleshoot -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">?</div>
+      <h2 class="step-title">うまくいかないとき</h2>
+    </div>
+    <div class="step-body">
+      <ul class="list">
+        <li><strong>python / python3 が見つからない</strong>：インストール後にターミナルを再起動してみてください。</li>
+        <li><strong>pip が見つからない</strong>：<code>python -m pip install --upgrade pip</code> を先に実行。</li>
+        <li><strong>データフォルダが見つからないと言われる</strong>：パスの階層が正しいか確認。スペースがある場合はパスを <code>"..."</code> で囲む。</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>bruker_tof_reader setup manual — このHTMLは単体ファイルで配布できます</footer>
+</div>
+
+<script>
+  // Tabs (scoped to each step)
+  document.querySelectorAll('.step-body').forEach(body => {
+    const tabs = body.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const panelId = tab.getAttribute('data-panel');
+        body.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        const panel = body.querySelector('#' + panelId);
+        if (panel) panel.classList.add('active');
+      });
+    });
+  });
+
+  // Copy buttons
+  document.querySelectorAll('.btn-copy').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-target');
+      const el = document.getElementById(id);
+      const sid = 's-' + id.slice(2);
+      const st = document.getElementById(sid);
+      if (!el) return;
+      const text = el.textContent;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+          document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        if (st) { st.textContent = 'コピーしました'; st.className = 'copy-status ok'; }
+      } catch(e) {
+        if (st) { st.textContent = 'コピー失敗'; st.className = 'copy-status bad'; }
+      }
+      if (st) setTimeout(() => { st.textContent = ''; st.className = 'copy-status'; }, 1600);
+    });
+  });
+</script>
+</body>
+</html>
