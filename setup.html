@@ -6,14 +6,14 @@
   <title>Bruker TOF Peak Picker — セットアップ＆実行マニュアル</title>
   <style>
     :root{
-      --bg:#0b0f14; --text:#e6edf3; --muted:#aab6c5; --line:#223045;
-      --accent:#6ee7ff; --good:#7CFF6B; --bad:#ff6b6b;
-      --code:#070a0e;
+      --bg:#ffffff; --text:#1a1a1a; --muted:#666e7a; --line:#e0e5eb;
+      --accent:#0070f3; --good:#16a34a; --bad:#dc2626;
+      --code:#f6f8fa;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     }
     *{box-sizing:border-box;}
-    body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.7;}
+    body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.7;border-top:3px solid var(--accent);}
     a{color:var(--accent);text-decoration:none;}
     a:hover{text-decoration:underline;}
 
@@ -29,7 +29,7 @@
     .step-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
     .step-num{
       width:28px;height:28px;border-radius:50%;
-      background:rgba(110,231,255,.15);border:1px solid rgba(110,231,255,.35);
+      background:rgba(0,112,243,.1);border:1px solid rgba(0,112,243,.3);
       color:var(--accent);font-size:13px;font-weight:bold;
       display:flex;align-items:center;justify-content:center;flex-shrink:0;
     }
@@ -44,7 +44,7 @@
       background:transparent;color:var(--muted);font-size:13px;cursor:pointer;
     }
     .tab.active{
-      background:rgba(110,231,255,.12);color:var(--text);border-color:rgba(110,231,255,.35);
+      background:rgba(0,112,243,.08);color:var(--accent);border-color:rgba(0,112,243,.35);
     }
     .panel{display:none;}
     .panel.active{display:block;}
@@ -68,12 +68,12 @@
     /* Note */
     .note{
       border-left:3px solid var(--accent);padding:8px 12px;
-      background:rgba(110,231,255,.05);border-radius:0 8px 8px 0;
+      background:rgba(0,112,243,.04);border-radius:0 8px 8px 0;
       color:var(--muted);font-size:13px;margin-bottom:10px;
     }
     .warn-note{
-      border-left:3px solid #ffd86e;padding:8px 12px;
-      background:rgba(255,216,110,.05);border-radius:0 8px 8px 0;
+      border-left:3px solid #f59e0b;padding:8px 12px;
+      background:rgba(245,158,11,.06);border-radius:0 8px 8px 0;
       color:var(--muted);font-size:13px;margin-bottom:10px;
     }
     ul.list{padding-left:18px;color:var(--muted);font-size:14px;margin:8px 0;}
@@ -149,7 +149,7 @@
         </div>
       </div>
 
-      <div class="warn-note">うまくいかない場合は先に <code>python -m pip install --upgrade pip</code> を実行してみてください。</div>
+      <div class="warn-note" style="white-space:nowrap;overflow:auto;">うまくいかない場合は先に <code>python -m pip install --upgrade pip</code> を実行してみてください。</div>
     </div>
   </div>
 
@@ -234,6 +234,7 @@ cd bruker_tof_reader</code></div>
       </div>
 
       <div class="note">実行するとブラウザが自動で開き、スペクトルが表示されます。</div>
+      <div class="warn-note">💡 毎回長いコマンドを打つのが面倒な場合は、<code>mal</code> などの短いエイリアスを設定できます。設定方法はAIに「ターミナルでエイリアスを設定する方法」と聞いてみてください。</div>
     </div>
   </div>
 
