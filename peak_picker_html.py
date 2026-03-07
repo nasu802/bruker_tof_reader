@@ -859,24 +859,17 @@ function renderAll() {
 
 // ── PNG保存 ─────────────────────────────────────────────────
 const SAMPLE_NAME = '{title}';
-let saveName = false;
+let showSampleName = false;
 function toggleSaveName() {
-  saveName = !saveName;
-  document.getElementById('btn-save-name').textContent = saveName ? 'サンプル名あり' : 'サンプル名なし';
-  document.getElementById('btn-save-name').className = saveName ? 'primary' : '';
+  showSampleName = !showSampleName;
+  document.getElementById('btn-save-name').textContent = showSampleName ? 'サンプル名あり' : 'サンプル名なし';
+  document.getElementById('btn-save-name').className = showSampleName ? 'primary' : '';
+  Plotly.relayout('chart', showSampleName
+    ? { title: { text: SAMPLE_NAME, font: { size: 14 } }, 'margin.t': 50 }
+    : { 'title.text': '', 'margin.t': 30 });
 }
 function savePng() {
-  if (saveName) {
-    Plotly.relayout('chart', { title: { text: SAMPLE_NAME, font: { size: 15 } }, 'margin.t': 55 })
-      .then(function() {
-        return Plotly.downloadImage('chart', { format: 'png', filename: SAMPLE_NAME, scale: 3 });
-      })
-      .then(function() {
-        Plotly.relayout('chart', { 'title.text': '', 'margin.t': 30 });
-      });
-  } else {
-    Plotly.downloadImage('chart', { format: 'png', filename: SAMPLE_NAME, scale: 3 });
-  }
+  Plotly.downloadImage('chart', { format: 'png', filename: SAMPLE_NAME, scale: 3 });
 }
 
 // ── ラベル全表示トグル ────────────────────────────────────────
