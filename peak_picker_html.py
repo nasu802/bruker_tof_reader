@@ -19,11 +19,11 @@ __version__ = "2026.03.08"
 _UPDATE_URL = "https://raw.githubusercontent.com/nasu802/bruker_tof_reader/main/peak_picker_html.py"
 
 
-def _check_update() -> None:
-    """GitHubの最新バージョンを確認して通知する（オフライン時・git管理下は無視）。"""
-    # .git フォルダがある = 開発者環境なのでスキップ
+def _check_update() -> str:
+    """GitHubの最新バージョンを確認して通知する（オフライン時・git管理下は無視）。
+    アップデートがある場合はHTMLバナー用のHTML文字列を返す。なければ空文字。"""
     if (Path(__file__).parent / ".git").exists():
-        return
+        return ""
     try:
         req = urllib.request.Request(_UPDATE_URL, headers={"User-Agent": "bruker_tof_reader"})
         with urllib.request.urlopen(req, timeout=3) as r:
@@ -32,10 +32,28 @@ def _check_update() -> None:
                     latest = line.split('"')[1]
                     if latest != __version__:
                         print(f"[INFO] アップデートがあります: {__version__} → {latest}")
-                        print(f"       最新版: {_UPDATE_URL}")
+                        return (
+                            f'<style>'
+                            f'@keyframes ub-in{{from{{transform:translateY(-120%);opacity:0}}to{{transform:translateY(0);opacity:1}}}}'
+                            f'@keyframes ub-out{{from{{transform:translateY(0);opacity:1}}to{{transform:translateY(-120%);opacity:0}}}}'
+                            f'#update-banner{{position:fixed;top:16px;left:16px;'
+                            f'background:#27ae60;color:#fff;border-radius:14px;'
+                            f'padding:11px 16px;font-size:13px;display:flex;align-items:center;gap:12px;'
+                            f'box-shadow:0 4px 20px rgba(0,0,0,0.35);z-index:99999;white-space:nowrap;'
+                            f'animation:ub-in 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;}}'
+                            f'#update-banner.hide{{animation:ub-out 0.3s ease-in forwards;}}'
+                            f'</style>'
+                            f'<div id="update-banner">'
+                            f'<span>アップデートがあります&nbsp;<span style="opacity:0.7;font-size:11px">{__version__} → {latest}</span></span>'
+                            f'<button onclick="var b=document.getElementById(\'update-banner\');b.classList.add(\'hide\');setTimeout(function(){{b.remove()}},300);" '
+                            f'style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:12px;cursor:pointer;'
+                            f'padding:3px 9px;border-radius:8px;margin-left:4px;">✕</button>'
+                            f'</div>'
+                        )
                     break
     except Exception:
-        pass  # オフライン or タイムアウト → 無視
+        pass
+    return ""
 
 import numpy as np
 
@@ -178,6 +196,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 </style>
 </head>
 <body>
+{update_banner}
 <div id="loading">
   <div class="spinner"></div>
   <p>スペクトルを読み込み中...</p>
@@ -185,9 +204,10 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <div id="header">
   <h1 id="header-title">Peak Picker ― {title}</h1>
   <span style="font-size:12px;opacity:0.8">ラベル密度</span>
-  <input id="label-gap-slider" type="range" min="1" max="50" step="1" value="36" style="width:80px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右: 多く / 左: 少なく）">
+  <input id="label-gap-slider" type="range" min="5" max="80" step="1" value="25" style="width:80px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右: 少なく / 左: 多く）">
+  <button onclick="resetLabelGap()" title="ラベル密度を初期値に戻す" style="font-size:11px;padding:3px 7px;">↺</button>
   <button id="btn-all-labels" onclick="toggleAllLabels()" title="ラベル全表示切替">ラベル全表示</button>
-  <button onclick="savePng()">PNG保存</button>
+  <button onclick="savePng()">グラフ保存</button>
   <button onclick="clearAll()" class="danger">全消去</button>
   <button id="fb-btn" title="バグ報告・ご要望" style="background:#34495e;color:#fff;border-color:#34495e;font-size:12px;padding:4px 10px;">お悩みボックス</button>
 </div>
@@ -781,10 +801,7 @@ function addPeakRaw(mz, intensity) {
 
 // ── ラベル間引き ──────────────────────────────────────────────
 function renderLabels() {
-  // スライダー値から最小m/z間隔を計算
-  // pixelGap: ラベルが視覚的に重ならない最小間隔（px幅 → m/z換算）
-  // labelGap: スライダーで指定した最小間隔
-  // どちらか大きい方を使う（スライダーは常に有効、かつ視覚重なりも防ぐ）
+  // スライダー値(px)から最小m/z間隔を計算: minMzGap = max(slider, 14px) / pxPerMz
   const chartEl  = document.getElementById('chart');
   const plotWidth = Math.max(100, chartEl.offsetWidth - 70);
 
@@ -795,8 +812,7 @@ function renderLabels() {
     lo = X_DATA[0] ?? 0; hi = X_DATA[X_DATA.length - 1] ?? 1;
   }
   const pxPerMz  = plotWidth / Math.max(hi - lo, 0.01);
-  const pixelGap = 14 / pxPerMz;          // 14px のラベル幅をm/z単位に換算
-  const minMzGap = Math.max(labelGap, pixelGap);
+  const minMzGap = Math.max(labelGap, 14) / pxPerMz;  // スライダー(px)→m/z換算
 
   // 表示範囲内のピークを強度降順で greedy 選択
   const candidates = peaks
@@ -846,9 +862,15 @@ function savePng() {
 
 // ── ラベル全表示トグル ────────────────────────────────────────
 let showAllLabels = false;
-let labelGap = 15.0;  // 初期値: スライダー36 → 51-36=15
+const LABEL_GAP_DEFAULT = 25;  // px
+let labelGap = LABEL_GAP_DEFAULT;
 function updateLabelGap(val) {
-  labelGap = 51 - parseFloat(val);  // 右スライド→小さい gap→ラベル増
+  labelGap = parseFloat(val);  // スライダー値はpx単位（小さい→密、大きい→疎）
+  renderLabels();
+}
+function resetLabelGap() {
+  labelGap = LABEL_GAP_DEFAULT;
+  document.getElementById('label-gap-slider').value = LABEL_GAP_DEFAULT;
   renderLabels();
 }
 function toggleAllLabels() {
@@ -1040,7 +1062,7 @@ def main():
             t.join()
 
     # アップデート確認（オフライン時は無視）
-    _check_update()
+    update_banner = _check_update()
 
     # Plotly JS をローカルに確保（初回のみダウンロード）
     _ensure_plotly()
@@ -1149,6 +1171,7 @@ def main():
                 .replace("{title}", first_name)
                 .replace("{spectra_json}", json.dumps(spectra))
                 .replace("{feedback_widget_js}", feedback_js)
+                .replace("{update_banner}", update_banner)
                 .replace("{plotly_js}", _PLOTLY_FILE.read_text(encoding="utf-8")))
         html_out_path.write_text(html, encoding="utf-8")
 

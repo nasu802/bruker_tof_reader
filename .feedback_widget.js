@@ -130,9 +130,25 @@
       document.getElementById('fb-text').focus();
       return;
     }
+    // 確認ステップ
+    var body = document.getElementById('fb-body');
+    var footer = document.getElementById('fb-footer');
+    body.innerHTML =
+      '<div style="padding:20px 4px;text-align:center;">' +
+      '<div style="font-size:15px;font-weight:bold;margin-bottom:8px;">本当に送信しますか？</div>' +
+      '<div style="font-size:12px;color:#888;">内容を確認してから送ってください。</div>' +
+      '</div>';
+    footer.style.justifyContent = 'center';
+    footer.innerHTML =
+      '<button id="fb-back" style="padding:6px 18px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;font-size:13px;">戻る</button>' +
+      '<button id="fb-confirm" style="padding:6px 18px;border:none;border-radius:4px;background:#2980b9;color:#fff;cursor:pointer;font-size:13px;">送信する</button>';
+    document.getElementById('fb-back').addEventListener('click', function () { resetPanel(); loadDraft(); });
+    document.getElementById('fb-confirm').addEventListener('click', function () { doSend(text); });
+  }
 
+  function doSend(text) {
     var type = (document.querySelector('input[name="fb-type"]:checked') || {}).value || '不明';
-    var email = document.getElementById('fb-email').value.trim();
+    var email = document.getElementById('fb-email') ? document.getElementById('fb-email').value.trim() : '';
     var now = new Date().toLocaleString('ja-JP');
 
     var lines = [
@@ -144,7 +160,7 @@
       text,
     ].filter(function (l) { return l !== ''; }).join('\n');
 
-    var btn = document.getElementById('fb-submit');
+    var btn = document.getElementById('fb-confirm');
     btn.disabled = true;
     btn.textContent = '送信中…';
 
@@ -158,7 +174,7 @@
       showSuccess();
     }).catch(function () {
       btn.disabled = false;
-      btn.textContent = '送信';
+      btn.textContent = '送信する';
       var err = document.getElementById('fb-err');
       err.textContent = 'オフラインまたはエラーのため送信できませんでした';
       err.style.display = 'block';
@@ -206,7 +222,7 @@
       '<div style="text-align:center;padding:28px 12px;">' +
       '<div style="font-size:40px;color:#27ae60;margin-bottom:10px">&#10003;</div>' +
       '<div style="font-size:15px;font-weight:bold;color:#27ae60;margin-bottom:8px">送信しました！</div>' +
-      '<div style="font-size:12px;color:#666;line-height:1.6">メーラーが開きます。<br>内容を確認して送信してください。</div>' +
+      '<div style="font-size:12px;color:#666;line-height:1.6">フィードバックを送信しました。</div>' +
       '</div>';
     footer.style.justifyContent = 'center';
     footer.innerHTML = '<button id="fb-close2" style="padding:6px 24px;border:none;border-radius:4px;background:#2c3e50;color:#fff;cursor:pointer;font-size:13px">閉じる</button>';
