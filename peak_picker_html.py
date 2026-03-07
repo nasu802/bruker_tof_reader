@@ -482,9 +482,15 @@ function updateScale(idx, val) {
   allScales[idx] = scale;
   document.getElementById(`scale-val-${idx}`).textContent = scale.toFixed(2);
   if (idx === currentIdx) {
-    const scale = allScales[idx];
+    // スケール変更時はy軸を固定して視覚的に高さが変わるようにする
+    const chartEl = document.getElementById('chart');
+    const yRange = chartEl.layout && chartEl.layout.yaxis && chartEl.layout.yaxis.range
+      ? [...chartEl.layout.yaxis.range] : null;
     Plotly.restyle('chart', { y: [Y_DATA.map(v => v * scale)] }, [0]);
-    Plotly.restyle('chart', { y: [peaks.map(p => p.intensity * scale)] }, [1]).then(renderLabels);
+    Plotly.restyle('chart', { y: [peaks.map(p => p.intensity * scale)] }, [1]).then(() => {
+      if (yRange) Plotly.relayout('chart', { 'yaxis.autorange': false, 'yaxis.range': yRange });
+      renderLabels();
+    });
   } else {
     rebuildOverlayTraces();
   }
