@@ -202,8 +202,8 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <div id="header">
   <h1 id="header-title">Peak Picker ― {title}</h1>
   <span style="font-size:12px;opacity:0.8">ラベル密度</span>
-  <input id="label-gap-slider" type="range" min="0" max="80" step="1" value="25" style="width:80px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右: 少なく / 左: 多く / 0: 非表示）">
-  <button onclick="resetLabelGap()" title="ラベル密度を初期値に戻す" style="font-size:11px;padding:3px 7px;">↺</button>
+  <input id="label-gap-slider" type="range" min="0" max="80" step="1" value="56" style="width:80px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右: 多く / 左: 少なく / 0: 非表示）">
+  <button onclick="resetLabelGap()" title="ラベル密度を初期値に戻す" style="font-size:11px;padding:3px 7px;background:#aaa;color:#fff;border-color:#aaa;">↺</button>
   <button id="btn-all-labels" onclick="toggleAllLabels()" title="ラベル全表示切替">ラベル全表示</button>
   <button onclick="savePng()" id="btn-save-png">グラフ保存</button>
   <button onclick="toggleSaveName()" id="btn-save-name" title="保存時にサンプル名をグラフに表示">サンプル名なし</button>
@@ -880,14 +880,16 @@ function savePng() {
 // ── ラベル全表示トグル ────────────────────────────────────────
 let showAllLabels = false;
 const LABEL_GAP_DEFAULT = 25;  // px
+const LABEL_SLIDER_DEFAULT = 56;  // 81-25=56
 let labelGap = LABEL_GAP_DEFAULT;
 function updateLabelGap(val) {
-  labelGap = parseFloat(val);  // スライダー値はpx単位（小さい→密、大きい→疎）
+  const v = parseFloat(val);
+  labelGap = v === 0 ? 0 : (81 - v);  // 左端=非表示、右→多く(gap小)、左→少なく(gap大)
   renderLabels();
 }
 function resetLabelGap() {
   labelGap = LABEL_GAP_DEFAULT;
-  document.getElementById('label-gap-slider').value = LABEL_GAP_DEFAULT;
+  document.getElementById('label-gap-slider').value = LABEL_SLIDER_DEFAULT;
   renderLabels();
 }
 function toggleAllLabels() {
