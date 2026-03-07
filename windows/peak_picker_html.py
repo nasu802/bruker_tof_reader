@@ -202,7 +202,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <div id="header">
   <h1 id="header-title">Peak Picker ― {title}</h1>
   <span style="font-size:12px;opacity:0.8">ラベル密度</span>
-  <input id="label-gap-slider" type="range" min="0" max="80" step="1" value="56" style="width:80px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右: 多く / 左: 少なく / 0: 非表示）">
+  <input id="label-gap-slider" type="range" min="0" max="81" step="1" value="56" style="width:80px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右端: 全表示 / 左端: 非表示）">
   <button onclick="resetLabelGap()" title="ラベル密度を初期値に戻す" style="font-size:11px;padding:3px 7px;background:#aaa;color:#fff;border-color:#aaa;">↺</button>
   <span style="display:inline-flex;gap:0"><button onclick="savePng()" style="border-radius:4px 0 0 4px">グラフ保存</button><button onclick="toggleSaveName()" id="btn-save-name" title="凡例表示切替" style="padding:3px 7px;border-left:none;border-radius:0 4px 4px 0;">≡</button></span>
   <button onclick="clearAll()" class="danger">全消去</button>
@@ -880,10 +880,13 @@ const LABEL_SLIDER_DEFAULT = 56;  // 81-25=56
 let labelGap = LABEL_GAP_DEFAULT;
 function updateLabelGap(val) {
   const v = parseFloat(val);
-  labelGap = v === 0 ? 0 : (81 - v);  // 左端=非表示、右→多く(gap小)、左→少なく(gap大)
+  if (v === 0) { labelGap = 0; showAllLabels = false; }
+  else if (v === 81) { showAllLabels = true; }
+  else { showAllLabels = false; labelGap = 81 - v; }
   renderLabels();
 }
 function resetLabelGap() {
+  showAllLabels = false;
   labelGap = LABEL_GAP_DEFAULT;
   document.getElementById('label-gap-slider').value = LABEL_SLIDER_DEFAULT;
   renderLabels();
