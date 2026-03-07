@@ -204,9 +204,9 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <div id="header">
   <h1 id="header-title">Peak Picker ― {title}</h1>
   <span style="font-size:12px;opacity:0.8">ラベル密度</span>
-  <input id="label-gap-slider" type="range" min="0" max="81" step="1" value="56" style="width:80px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右端: 全表示 / 左端: 非表示）">
+  <input id="label-gap-slider" type="range" min="0" max="200" step="1" value="140" style="width:120px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右端: 全表示 / 左端: 非表示）">
   <button onclick="resetLabelGap()" title="ラベル密度を初期値に戻す" style="font-size:11px;padding:3px 7px;background:#aaa;color:#fff;border-color:#aaa;">↺</button>
-  <span style="display:inline-flex;gap:0"><button onclick="savePng()" style="border-radius:4px 0 0 4px">グラフ保存</button><button onclick="toggleSaveName()" id="btn-save-name" title="凡例表示切替" style="padding:3px 7px;border-left:none;border-radius:0 4px 4px 0;">≡</button></span>
+  <button onclick="savePng()">グラフ保存</button>
   <button onclick="clearAll()" class="danger">全消去</button>
   <button id="fb-btn" title="バグ報告・ご要望" style="background:#34495e;color:#fff;border-color:#34495e;font-size:12px;padding:4px 10px;">お悩みボックス</button>
 </div>
@@ -447,7 +447,6 @@ function switchSpectrum(idx) {
   const scale = allScales[idx];
   Plotly.restyle('chart', { x: [X_DATA], y: [Y_DATA.map(v => v * scale)], 'line.color': [color], 'line.width': [1.5], 'line.dash': ['solid'], name: [ALL_SPECTRA[idx].name], type: ['scattergl'] }, [0]);
   Plotly.restyle('chart', { 'marker.color': [color], 'textfont.color': [color] }, [1]);
-  if (showLegend) Plotly.restyle('chart', { name: [ALL_SPECTRA[idx].name] }, [0]);
   renderAll();
   rebuildOverlayTraces();
   // ズーム範囲を保持（xは現在のまま、yはauto）
@@ -573,6 +572,8 @@ const layout = {
   hovermode: 'x',
   dragmode: 'zoom',
   plot_bgcolor: 'white',
+  showlegend: true,
+  legend: { x: 1, xanchor: 'right', y: 1, font: { size: 11 } },
 };
 // 初期ピークはすでに allPeaks[0] に入っているのでそのまま使う
 
@@ -858,19 +859,6 @@ function renderAll() {
 
 // ── PNG保存 ─────────────────────────────────────────────────
 const SAMPLE_NAME = '{title}';
-let showLegend = false;
-function toggleSaveName() {
-  showLegend = !showLegend;
-  document.getElementById('btn-save-name').textContent = showLegend ? 'サンプル名あり' : 'サンプル名なし';
-  document.getElementById('btn-save-name').className = showLegend ? 'primary' : '';
-  if (showLegend) {
-    Plotly.restyle('chart', { showlegend: [true], name: [ALL_SPECTRA[currentIdx].name] }, [0]);
-    Plotly.relayout('chart', { showlegend: true });
-  } else {
-    Plotly.restyle('chart', { showlegend: [false] }, [0]);
-    Plotly.relayout('chart', { showlegend: false });
-  }
-}
 function savePng() {
   Plotly.downloadImage('chart', { format: 'png', filename: SAMPLE_NAME, scale: 3 });
 }
@@ -878,13 +866,13 @@ function savePng() {
 // ── ラベル全表示トグル ────────────────────────────────────────
 let showAllLabels = false;
 const LABEL_GAP_DEFAULT = 25;  // px
-const LABEL_SLIDER_DEFAULT = 56;  // 81-25=56
+const LABEL_SLIDER_DEFAULT = 140;  // 200-25=175 → 140程度
 let labelGap = LABEL_GAP_DEFAULT;
 function updateLabelGap(val) {
   const v = parseFloat(val);
   if (v === 0) { labelGap = 0; showAllLabels = false; }
-  else if (v === 81) { showAllLabels = true; }
-  else { showAllLabels = false; labelGap = 81 - v; }
+  else if (v === 200) { showAllLabels = true; }
+  else { showAllLabels = false; labelGap = 200 - v; }
   renderLabels();
 }
 function resetLabelGap() {
