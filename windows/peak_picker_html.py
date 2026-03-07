@@ -447,6 +447,7 @@ function switchSpectrum(idx) {
   const scale = allScales[idx];
   Plotly.restyle('chart', { x: [X_DATA], y: [Y_DATA.map(v => v * scale)], 'line.color': [color], 'line.width': [1.5], 'line.dash': ['solid'], name: [ALL_SPECTRA[idx].name], type: ['scattergl'] }, [0]);
   Plotly.restyle('chart', { 'marker.color': [color], 'textfont.color': [color] }, [1]);
+  if (showLegend) Plotly.restyle('chart', { name: [ALL_SPECTRA[idx].name] }, [0]);
   renderAll();
   rebuildOverlayTraces();
   // ズーム範囲を保持（xは現在のまま、yはauto）
@@ -857,14 +858,18 @@ function renderAll() {
 
 // ── PNG保存 ─────────────────────────────────────────────────
 const SAMPLE_NAME = '{title}';
-let showSampleName = false;
+let showLegend = false;
 function toggleSaveName() {
-  showSampleName = !showSampleName;
-  document.getElementById('btn-save-name').textContent = showSampleName ? 'サンプル名あり' : 'サンプル名なし';
-  document.getElementById('btn-save-name').className = showSampleName ? 'primary' : '';
-  Plotly.relayout('chart', showSampleName
-    ? { title: { text: SAMPLE_NAME, font: { size: 14 } }, 'margin.t': 50 }
-    : { 'title.text': '', 'margin.t': 30 });
+  showLegend = !showLegend;
+  document.getElementById('btn-save-name').textContent = showLegend ? 'サンプル名あり' : 'サンプル名なし';
+  document.getElementById('btn-save-name').className = showLegend ? 'primary' : '';
+  if (showLegend) {
+    Plotly.restyle('chart', { showlegend: [true], name: [ALL_SPECTRA[currentIdx].name] }, [0]);
+    Plotly.relayout('chart', { showlegend: true });
+  } else {
+    Plotly.restyle('chart', { showlegend: [false] }, [0]);
+    Plotly.relayout('chart', { showlegend: false });
+  }
 }
 function savePng() {
   Plotly.downloadImage('chart', { format: 'png', filename: SAMPLE_NAME, scale: 3 });
