@@ -8,7 +8,7 @@
   function init(options) {
     cfg = Object.assign({
       appName: 'App',
-      mailto: '',
+      webhookUrl: '',
       position: 'top-right',
       buttonLabel: 'フィードバック',
     }, options);
@@ -134,44 +134,35 @@
     var type = (document.querySelector('input[name="fb-type"]:checked') || {}).value || '不明';
     var email = document.getElementById('fb-email').value.trim();
     var now = new Date().toLocaleString('ja-JP');
-    var ua = navigator.userAgent;
-    var url = location.href;
-    var screen_size = window.screen.width + 'x' + window.screen.height;
 
-    var body = [
-      '【フィードバック】' + cfg.appName,
-      '─────────────────────────────',
-      '種別    : ' + type,
-      '日時    : ' + now,
-      'アプリ  : ' + cfg.appName,
-      'URL     : ' + url,
-      'ブラウザ: ' + ua,
-      '画面    : ' + screen_size,
-      '',
-      '内容:',
+    var lines = [
+      '**【' + type + '】** ' + cfg.appName,
+      '```',
+      '日時  : ' + now,
+      email ? ('返信先: ' + email) : '',
+      '```',
       text,
-      '',
-      email ? ('返信先 : ' + email) : '',
-      '─────────────────────────────',
-    ].filter(function (l, i) {
-      // 末尾の空返信先行を除く（空文字の行はfilterで消す、ただし内容の空行は残す）
-      return !(i > 10 && l === '');
-    }).join('\n');
+    ].filter(function (l) { return l !== ''; }).join('\n');
 
-    var subject = '【' + cfg.appName + '】' + type + ' – ' + now;
-    var mailto = 'mailto:' + cfg.mailto
-      + '?subject=' + encodeURIComponent(subject)
-      + '&body=' + encodeURIComponent(body);
+    var btn = document.getElementById('fb-submit');
+    btn.disabled = true;
+    btn.textContent = '送信中…';
 
-    var a = document.createElement('a');
-    a.href = mailto;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    clearDraft();
-    showSuccess();
+    fetch(cfg.webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: lines, username: cfg.appName }),
+    }).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      clearDraft();
+      showSuccess();
+    }).catch(function () {
+      btn.disabled = false;
+      btn.textContent = '送信';
+      var err = document.getElementById('fb-err');
+      err.textContent = 'オフラインまたはエラーのため送信できませんでした';
+      err.style.display = 'block';
+    });
   }
 
   /* ── 下書き保存 ── */
