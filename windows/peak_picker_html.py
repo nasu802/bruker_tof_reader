@@ -205,8 +205,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   <input id="label-gap-slider" type="range" min="0" max="80" step="1" value="56" style="width:80px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右: 多く / 左: 少なく / 0: 非表示）">
   <button onclick="resetLabelGap()" title="ラベル密度を初期値に戻す" style="font-size:11px;padding:3px 7px;background:#aaa;color:#fff;border-color:#aaa;">↺</button>
   <button id="btn-all-labels" onclick="toggleAllLabels()" title="ラベル全表示切替">ラベル全表示</button>
-  <button onclick="savePng()" id="btn-save-png">グラフ保存</button>
-  <button onclick="toggleSaveName()" id="btn-save-name" title="保存時にサンプル名をグラフに表示">サンプル名なし</button>
+  <button onclick="savePng()" id="btn-save-png">グラフ保存</button><button onclick="toggleSaveName()" id="btn-save-name" title="凡例（サンプル名）表示切替" style="padding:3px 6px;font-size:12px;margin-left:1px;">≡</button>
   <button onclick="clearAll()" class="danger">全消去</button>
   <button id="fb-btn" title="バグ報告・ご要望" style="background:#34495e;color:#fff;border-color:#34495e;font-size:12px;padding:4px 10px;">お悩みボックス</button>
 </div>
