@@ -204,7 +204,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <div id="header">
   <h1 id="header-title">Peak Picker ― {title}</h1>
   <span style="font-size:12px;opacity:0.8">ラベル密度</span>
-  <input id="label-gap-slider" type="range" min="0" max="200" step="1" value="150" style="width:120px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右端: 全表示 / 左端: 非表示）">
+  <input id="label-gap-slider" type="range" min="0" max="200" step="1" value="60" style="width:120px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右端: 全表示 / 左端: 非表示）">
   <button onclick="resetLabelGap()" title="ラベル密度を初期値に戻す" style="font-size:11px;padding:3px 7px;background:#aaa;color:#fff;border-color:#aaa;">↺</button>
   <button onclick="savePng()">グラフ保存</button>
   <button onclick="clearAll()" class="danger">全消去</button>
@@ -866,12 +866,14 @@ function savePng() {
 // ── ラベル全表示トグル ────────────────────────────────────────
 let showAllLabels = false;
 const LABEL_GAP_DEFAULT = 25;  // px
-const LABEL_SLIDER_DEFAULT = 150;  // 200-25/0.5=150
+const LABEL_SLIDER_DEFAULT = 60;  // 指数スケールでgap≈25px
 let labelGap = LABEL_GAP_DEFAULT;
 function updateLabelGap(val) {
   const v = parseFloat(val);
   showAllLabels = false;
-  labelGap = v === 0 ? 0 : (200 - v) * 0.5;  // val=200→0.5px(全表示に近い), val=0→非表示
+  // 指数スケール: 右に行くほど加速度的にラベルが増える
+  // val=0→非表示, val=60→25px(デフォ), val=200→0.4px(ほぼ全表示)
+  labelGap = v === 0 ? 0 : 150 * Math.exp(-0.03 * v);
   renderLabels();
 }
 function resetLabelGap() {
