@@ -15,7 +15,7 @@ import time
 import urllib.request
 from pathlib import Path
 
-__version__ = "2026.03.07"
+__version__ = "2026.03.08"
 _UPDATE_URL = "https://raw.githubusercontent.com/nasu802/bruker_tof_reader/main/peak_picker_html.py"
 
 
