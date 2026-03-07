@@ -204,7 +204,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <div id="header">
   <h1 id="header-title">Peak Picker ― {title}</h1>
   <span style="font-size:12px;opacity:0.8">ラベル密度</span>
-  <input id="label-gap-slider" type="range" min="5" max="80" step="1" value="25" style="width:80px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右: 少なく / 左: 多く）">
+  <input id="label-gap-slider" type="range" min="0" max="80" step="1" value="25" style="width:80px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右: 少なく / 左: 多く / 0: 非表示）">
   <button onclick="resetLabelGap()" title="ラベル密度を初期値に戻す" style="font-size:11px;padding:3px 7px;">↺</button>
   <button id="btn-all-labels" onclick="toggleAllLabels()" title="ラベル全表示切替">ラベル全表示</button>
   <button onclick="savePng()">グラフ保存</button>
@@ -802,6 +802,7 @@ function addPeakRaw(mz, intensity) {
 // ── ラベル間引き ──────────────────────────────────────────────
 function renderLabels() {
   // スライダー値(px)から最小m/z間隔を計算: minMzGap = max(slider, 14px) / pxPerMz
+  if (labelGap === 0) { Plotly.relayout('chart', { annotations: [] }); return; }
   const chartEl  = document.getElementById('chart');
   const plotWidth = Math.max(100, chartEl.offsetWidth - 70);
 
