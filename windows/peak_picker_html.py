@@ -21,7 +21,9 @@ _UPDATE_URL = "https://raw.githubusercontent.com/nasu802/bruker_tof_reader/main/
 
 
 def _check_update() -> None:
-    """GitHubの最新バージョンを確認して通知する（オフライン時は無視）。"""
+    """GitHubの最新バージョンを確認して通知する（オフライン時・git管理下は無視）。"""
+    if (Path(__file__).parent / ".git").exists():
+        return
     try:
         req = urllib.request.Request(_UPDATE_URL, headers={"User-Agent": "bruker_tof_reader"})
         with urllib.request.urlopen(req, timeout=3) as r:
@@ -204,6 +206,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   <button id="btn-all-labels" onclick="toggleAllLabels()" title="ラベル全表示切替">ラベル全表示</button>
   <button onclick="savePng()">PNG保存</button>
   <button onclick="clearAll()" class="danger">全消去</button>
+  <button id="fb-btn" title="バグ報告・ご要望" style="background:#34495e;color:#fff;border-color:#34495e;font-size:12px;padding:4px 10px;">お悩みボックス</button>
 </div>
 <div id="controls">
   <input type="hidden" id="snapMz" value="2">
@@ -978,6 +981,14 @@ function clearAll() {
 })();
 </script>
 <script>{feedback_widget_js}</script>
+<script>
+if (window.FeedbackWidget) {
+  FeedbackWidget.init({
+    appName: document.title,
+    webhookUrl: 'https://discord.com/api/webhooks/1479781802695458950/aNXMSkC-gyoYzhJBzNnXYC9qABehlTax3nzuOqmRTpvnCYRJSN0UeQydaIFsGZza6MdV',
+  });
+}
+</script>
 </body>
 </html>
 """
