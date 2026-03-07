@@ -205,7 +205,8 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   <input id="label-gap-slider" type="range" min="0" max="80" step="1" value="25" style="width:80px;accent-color:#aaa" oninput="updateLabelGap(this.value)" title="ラベル表示密度（右: 少なく / 左: 多く / 0: 非表示）">
   <button onclick="resetLabelGap()" title="ラベル密度を初期値に戻す" style="font-size:11px;padding:3px 7px;">↺</button>
   <button id="btn-all-labels" onclick="toggleAllLabels()" title="ラベル全表示切替">ラベル全表示</button>
-  <button onclick="savePng()">グラフ保存</button>
+  <button onclick="savePng()" id="btn-save-png">グラフ保存</button>
+  <button onclick="toggleSaveName()" id="btn-save-name" title="保存時にサンプル名をグラフに表示">サンプル名なし</button>
   <button onclick="clearAll()" class="danger">全消去</button>
   <button id="fb-btn" title="バグ報告・ご要望" style="background:#34495e;color:#fff;border-color:#34495e;font-size:12px;padding:4px 10px;">お悩みボックス</button>
 </div>
@@ -855,8 +856,25 @@ function renderAll() {
 }
 
 // ── PNG保存 ─────────────────────────────────────────────────
+const SAMPLE_NAME = '{title}';
+let saveName = false;
+function toggleSaveName() {
+  saveName = !saveName;
+  document.getElementById('btn-save-name').textContent = saveName ? 'サンプル名あり' : 'サンプル名なし';
+  document.getElementById('btn-save-name').className = saveName ? 'primary' : '';
+}
 function savePng() {
-  Plotly.downloadImage('chart', { format: 'png', filename: document.title });
+  if (saveName) {
+    Plotly.relayout('chart', { title: { text: SAMPLE_NAME, font: { size: 15 } }, 'margin.t': 55 })
+      .then(function() {
+        return Plotly.downloadImage('chart', { format: 'png', filename: SAMPLE_NAME, scale: 3 });
+      })
+      .then(function() {
+        Plotly.relayout('chart', { 'title.text': '', 'margin.t': 30 });
+      });
+  } else {
+    Plotly.downloadImage('chart', { format: 'png', filename: SAMPLE_NAME, scale: 3 });
+  }
 }
 
 // ── ラベル全表示トグル ────────────────────────────────────────
